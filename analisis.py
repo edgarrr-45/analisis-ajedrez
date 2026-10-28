@@ -24,4 +24,29 @@ for c in ax.containers:
     ax.bar_label(c, labels=[f"{v:.1%}" for v in c.datavalues])
 plt.xticks(rotation=0)
 plt.savefig("victorias_por_modo.png", dpi=150, bbox_inches="tight")
-plt.show()
+plt.close()  
+
+
+def graficar_rating(df, modo, ventana=30):
+
+    df_modo = df[df["time_class"] == modo].copy()
+    df_modo = df_modo.sort_values("fecha")
+    df_modo["rating_suave"] = df_modo["mi_rating"].rolling(ventana).mean()
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(df_modo["fecha"], df_modo["mi_rating"], alpha=0.3, label="Cada partida")
+    ax.plot(df_modo["fecha"], df_modo["rating_suave"], linewidth=2, label=f"Promedio de {ventana} partidas")
+    ax.set_title(f"Rating en {modo} a lo largo del tiempo")
+    ax.set_xlabel("Fecha")
+    ax.set_ylabel("Rating")
+    ax.legend()
+    plt.savefig(f"rating_{modo}.png", dpi=150, bbox_inches="tight")
+    plt.close()
+
+
+
+
+ventanas = {"blitz": 30, "rapid": 30, "bullet": 15}
+
+for modo, ventana in ventanas.items():
+    graficar_rating(df, modo, ventana)
