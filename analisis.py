@@ -44,9 +44,37 @@ def graficar_rating(df, modo, ventana=30):
     plt.close()
 
 
-
-
 ventanas = {"blitz": 30, "rapid": 30, "bullet": 15}
 
 for modo, ventana in ventanas.items():
     graficar_rating(df, modo, ventana)
+
+df["mes"] = df["fecha"].dt.strftime("%Y-%m")
+partidas_por_mes = df.groupby("mes").size()
+
+print(partidas_por_mes)
+print(partidas_por_mes.sum())
+
+fig, ax = plt.subplots(figsize=(12, 5))
+partidas_por_mes.plot(kind="bar", ax=ax)
+ax.set_title("Partidas por mes")
+ax.set_xlabel("Mes")
+ax.set_ylabel("Partidas")
+plt.xticks(rotation=90, fontsize=8)
+plt.savefig("partidas_por_mes.png", dpi=150, bbox_inches="tight")
+plt.close()
+
+por_mes_modo = df.groupby(["mes", "time_class"]).size().unstack(fill_value=0)
+
+print(por_mes_modo)
+print(por_mes_modo.sum())
+
+fig, ax = plt.subplots(figsize=(12, 5))
+por_mes_modo.plot(kind="bar", stacked=True, ax=ax)
+ax.set_title("Partidas por mes y modo de juego")
+ax.set_xlabel("Mes")
+ax.set_ylabel("Partidas")
+ax.legend(title="Modo")
+plt.xticks(rotation=90, fontsize=8)
+plt.savefig("partidas_por_mes_modo.png", dpi=150, bbox_inches="tight")
+plt.close()
