@@ -2,9 +2,9 @@
 
 Proyecto de análisis de datos con Python para responder una pregunta simple: **¿dónde pierdo mis partidas?**
 
-Descargo mi historial completo de la API pública de Chess.com, lo limpio con pandas y lo analizo para encontrar patrones en mi forma de jugar: por color, por modo de juego, a lo largo del tiempo y, más adelante, por hora del día, rachas y apertura.
+Descargo mi historial completo de la API pública de Chess.com, lo limpio con pandas y lo analizo para encontrar patrones en mi forma de jugar: por color, por modo de juego, a lo largo del tiempo y, más adelante, por rachas, hora del día y apertura.
 
-> **Estado: en progreso.** Ya tengo el historial completo descargado y limpio, y tres análisis hechos: victorias por color, evolución del rating y actividad por mes y modo. Lo siguiente es investigar por qué ocurren algunos cambios y construir un dashboard.
+> **Estado: en progreso.** Ya tengo el historial completo descargado y limpio, y tres análisis hechos: victorias por color, evolución del rating y actividad por mes y modo. Lo siguiente es estudiar las rachas, investigar por qué ocurren algunos cambios y construir un dashboard.
 
 ## Resumen de los datos
 
@@ -33,28 +33,34 @@ Descargo mi historial completo de la API pública de Chess.com, lo limpio con pa
 
 Todavía no sé **por qué** pasa. Una hipótesis por probar es que alguna apertura con negras me cuesta especialmente, pero hoy no guardo la apertura de cada partida.
 
-## Hallazgo 2: mi rating sube en escalones, no de forma pareja
+## Hallazgo 2: mi rating sube jugando, y las pausas distorsionan la lectura por fecha
 
-Cada modo de juego tiene su propio rating en Chess.com, así que los analizo por separado. La línea tenue es el rating después de cada partida y la naranja es el promedio de las últimas 30 partidas (15 en bullet, que tiene pocas).
+Cada modo de juego tiene su propio rating en Chess.com, así que los analizo por separado. La línea tenue es el rating después de cada partida y la naranja es el promedio de las últimas 30 partidas (15 en bullet, que tiene pocas). Dibujo cada modo de dos formas: **por fecha** y **por número de partida**, que quita las pausas.
 
 ### Blitz
 
-![Rating en blitz](rating_blitz.png)
+![Rating en blitz por fecha](rating_blitz.png)
 
-- Hay progreso neto: de unos 150-380 en las primeras semanas a unos 540-550 hoy.
-- No es una subida constante: sube en escalones (primavera de 2024, finales de 2024, septiembre de 2025) y entre medias se devuelve. En septiembre de 2025 llegó a unos 550 y cayó a unos 420 en pocos meses. Los escalones coinciden con ráfagas de partidas de blitz (ver el hallazgo 3).
+![Rating en blitz por número de partida](rating_blitz_por_partida.png)
+
+- Hay progreso neto: de unos 150-380 en las primeras partidas a unos 540-550 hoy.
+- Por fecha parece que subo en escalones. **Por número de partida la subida es continua**: de unos 285 a unos 500 en unas 200 partidas (de la partida ~245 a la ~450). Los "saltos" eran partidas jugadas en pocas semanas, separadas por pausas.
+- Después de la partida ~450 casi no avanzo: en unas 850 partidas oscilo entre unos 400 y unos 560.
+- Hay **olas** de entre 80 y 160 puntos que suben y bajan cada 100-200 partidas. Todavía no sé a qué se deben.
 
 ### Rapid
 
-![Rating en rapid](rating_rapid.png)
+![Rating en rapid por fecha](rating_rapid.png)
+
+![Rating en rapid por número de partida](rating_rapid_por_partida.png)
 
 - Es mi mejor modo: hoy ronda los 800, contra unos 550 en blitz.
-- Subí de unos 270-290 a finales de octubre de 2023 a unos 790-820 hacia mediados de 2024, el mayor crecimiento sostenido de los tres modos. Después bajé a unos 650 a finales de 2024.
-- Entre enero de 2025 y septiembre de 2026 jugué solo 10 partidas de rapid, por eso la línea es casi recta. En octubre de 2026 el rating subió de golpe, de unos 470-540 a unos 800, y todavía no sé explicarlo.
+- Tras las primeras ~60 partidas de calibración, subí de forma sostenida de unos 290 a unos 790 en unas 700 partidas, y me quedé entre 690 y 820 durante unas 300 más.
+- Entre enero de 2025 y septiembre de 2026 jugué solo 10 partidas de rapid. Al volver en octubre de 2026, el rating de las primeras partidas cayó hasta unos 470 y después remontó hasta unos 830 en unas 90 partidas, recuperando mi mejor nivel mucho más rápido que la primera vez.
 
 ### Bullet
 
-![Rating en bullet](rating_bullet.png)
+![Rating en bullet por fecha](rating_bullet.png)
 
 - Es el modo con menos partidas (263), así que la línea es ruidosa y no saco conclusiones fuertes.
 - Cayó de unos 400-585 al inicio a unos 200 hacia abril de 2025, y se recuperó a unos 330-370 en 2026.
@@ -62,8 +68,8 @@ Cada modo de juego tiene su propio rating en Chess.com, así que los analizo por
 ### Cómo leer estas gráficas
 
 - Los **primeros días de cada cuenta son poco fiables**: Chess.com ajusta el rating con saltos grandes al principio (en rapid, mis primeras partidas pasan de 562 a 811 y a unos 270 en pocas semanas). Eso es una calibración, no un cambio real de nivel.
-- Los **tramos rectos largos son pausas** sin jugar, no datos que falten.
-- El promedio se calcula **por número de partidas, no por tiempo**. Cuando paso meses sin jugar casi no se mueve, y puede separarse de la línea real.
+- En las gráficas **por fecha**, los tramos rectos largos son pausas sin jugar, no datos que falten, y el promedio se calcula por número de partidas, no por tiempo.
+- En las gráficas **por número de partida** desaparecen las pausas, pero se pierde la referencia de cuándo ocurrió cada cosa. Las dos vistas se complementan.
 
 ## Hallazgo 3: cambié de modo de juego dos veces
 
@@ -77,12 +83,12 @@ Mi actividad es muy irregular (de 2 a 250 partidas por mes) y, sobre todo, **cam
 - Bullet va a rachas: marzo de 2024, enero y abril de 2025, y de diciembre de 2025 a febrero de 2026, cuando casi todo lo que jugué fue bullet.
 - Octubre de 2026 todavía no termina (los datos llegan hasta el 27), y ya es el segundo mes con más partidas del historial.
 
-Esto matiza el hallazgo 2: los escalones de blitz coinciden con ráfagas de partidas (marzo y abril de 2024, noviembre y diciembre de 2024, septiembre de 2025), y entre una y otra casi no juego blitz. **El rating solo se mueve cuando juego**, así que parte de ese patrón es simplemente actividad. No prueba por sí solo que juegue mejor ni peor, y tampoco explica las caídas, que ocurrieron mientras jugaba.
+Esto explica por qué las gráficas por fecha engañan: **el rating solo se mueve cuando juego**, así que una ráfaga de partidas en pocas semanas se ve como un salto, y una pausa como una línea plana.
 
 ### Preguntas abiertas
 
-- ¿Por qué subió el rating de rapid de unos 535 a unos 800 en las 96 partidas de octubre de 2026, tras un año casi sin jugarlo? Dos hipótesis sin comprobar: que el blitz de ese año me haya mejorado, o un efecto del sistema de rating tras mucho tiempo de inactividad.
-- ¿Qué pasó en la caída de blitz de finales de 2025, con actividad normal?
+- ¿A qué se deben las olas de 80 a 160 puntos en blitz? ¿Son rachas de victorias y derrotas, o cambios en cómo juego?
+- ¿Por qué la recuperación de rapid en octubre de 2026 fue tan rápida? Dos hipótesis sin comprobar: que el blitz de ese año me haya mejorado, o un efecto del sistema de rating tras mucho tiempo de inactividad.
 - ¿Por qué rindo mejor con blancas, sobre todo en blitz?
 
 ## Qué hace el proyecto
@@ -90,7 +96,7 @@ Esto matiza el hallazgo 2: los escalones de blitz coinciden con ráfagas de part
 1. `explorar.py` consulta la API pública de Chess.com, descarga mis partidas mes por mes y extrae los datos desde mi perspectiva: mi color, mi rating, el del rival, mi resultado, el modo de juego y las reglas.
 2. Convierte las fechas de UTC a la hora de Ciudad de México y clasifica los resultados de Chess.com (`win`, `resigned`, `timeout`, `abandoned`...) en victoria, derrota o empate.
 3. Verifica que no haya duplicados ni resultados sin clasificar, y guarda todo en `partidas.csv`.
-4. `analisis.py` lee ese CSV, filtra y genera las tablas y gráficas: victorias por modo y color, rating por modo y partidas por mes y modo.
+4. `analisis.py` lee ese CSV, filtra y genera las tablas y gráficas: victorias por modo y color, rating por modo (por fecha y por número de partida) y partidas por mes y modo.
 
 ## Decisiones de análisis
 
@@ -132,8 +138,9 @@ Para analizar otra cuenta, cambia `USUARIO` al inicio de `explorar.py` por un us
 - [x] Comparar victorias por color y modo de juego
 - [x] Evolución del rating en el tiempo, por modo de juego
 - [x] Partidas por mes y por modo de juego
-- [ ] Rating por número de partida, sin el efecto de las pausas
-- [ ] Rendimiento por hora del día y por rachas
+- [x] Rating por número de partida, sin el efecto de las pausas
+- [ ] Rachas: ¿gano más después de ganar y pierdo más después de perder?
+- [ ] Rendimiento por hora del día
 - [ ] Análisis por apertura
 - [ ] Investigar las partidas abandonadas
 - [ ] Dashboard interactivo con Streamlit
