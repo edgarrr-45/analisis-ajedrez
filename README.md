@@ -2,9 +2,9 @@
 
 Proyecto de análisis de datos con Python para responder una pregunta simple: **¿dónde pierdo mis partidas?**
 
-Descargo mi historial completo de la API pública de Chess.com, lo limpio con pandas y lo analizo para encontrar patrones en mi forma de jugar: por color, por modo de juego, a lo largo del tiempo y, más adelante, por rachas, hora del día y apertura.
+Descargo mi historial completo de la API pública de Chess.com, lo limpio con pandas y lo analizo para encontrar patrones en mi forma de jugar: por color, por modo de juego, a lo largo del tiempo, por rachas y, más adelante, por hora del día y apertura.
 
-> **Estado: en progreso.** Ya tengo el historial completo descargado y limpio, y tres análisis hechos: victorias por color, evolución del rating y actividad por mes y modo. Lo siguiente es estudiar las rachas, investigar por qué ocurren algunos cambios y construir un dashboard.
+> **Estado: en progreso.** Ya tengo el historial completo descargado y limpio, y cuatro análisis hechos: victorias por color, evolución del rating, actividad por mes y modo, y rachas. Lo siguiente es investigar las partidas que terminan por abandono o tiempo y construir un dashboard.
 
 ## Resumen de los datos
 
@@ -46,7 +46,7 @@ Cada modo de juego tiene su propio rating en Chess.com, así que los analizo por
 - Hay progreso neto: de unos 150-380 en las primeras partidas a unos 540-550 hoy.
 - Por fecha parece que subo en escalones. **Por número de partida la subida es continua**: de unos 285 a unos 500 en unas 200 partidas (de la partida ~245 a la ~450). Los "saltos" eran partidas jugadas en pocas semanas, separadas por pausas.
 - Después de la partida ~450 casi no avanzo: en unas 850 partidas oscilo entre unos 400 y unos 560.
-- Hay **olas** de entre 80 y 160 puntos que suben y bajan cada 100-200 partidas. Todavía no sé a qué se deben.
+- Hay **olas** de entre 80 y 160 puntos que suben y bajan cada 100-200 partidas. Todavía no sé a qué se deben (ver el hallazgo 4: no se explican por rachas de una partida a la siguiente).
 
 ### Rapid
 
@@ -85,9 +85,48 @@ Mi actividad es muy irregular (de 2 a 250 partidas por mes) y, sobre todo, **cam
 
 Esto explica por qué las gráficas por fecha engañan: **el rating solo se mueve cuando juego**, así que una ráfaga de partidas en pocas semanas se ve como un salto, y una pausa como una línea plana.
 
-### Preguntas abiertas
+## Hallazgo 4: ganar o perder no cambia mi siguiente resultado, pero sí si sigo jugando
 
-- ¿A qué se deben las olas de 80 a 160 puntos en blitz? ¿Son rachas de victorias y derrotas, o cambios en cómo juego?
+Analizo solo **blitz** (1,314 partidas que tienen una partida siguiente).
+
+### No hay evidencia de rachas
+
+| Después de... | Victorias en la siguiente partida | Partidas |
+|---|---|---|
+| No ganar | 48.8% | 656 |
+| Ganar | 51.4% | 658 |
+
+Si me quedo solo con partidas jugadas dentro de la misma sesión (a 30 minutos o menos de la anterior, 683 en total):
+
+| Después de... | Victorias en la siguiente partida | Partidas |
+|---|---|---|
+| No ganar | 48.3% | 269 |
+| Ganar | 51.7% | 414 |
+
+Las diferencias (2.6 y 3.4 puntos) caben en el ruido de grupos de este tamaño. Con estos datos no puedo decir que una victoria o una derrota cambie mi siguiente resultado. Esto descarta una explicación para las olas de blitz, pero no prueba que sean casualidad, porque solo miro una partida hacia atrás.
+
+### Lo que sí cambia: si sigo jugando
+
+La probabilidad de que mi siguiente partida llegue en menos de 30 minutos depende de cómo terminó la anterior:
+
+| Cómo terminó la partida | Seguí jugando en menos de 30 min | Partidas |
+|---|---|---|
+| Victoria | 62.9% | 658 |
+| Derrota limpia (rendición o mate) | 57.3% | 314 |
+| Abandono o tiempo | 22.1% | 307 |
+| Empate | 60.0% | 35 |
+
+- **La brecha entre ganar y perder viene sobre todo de las partidas que terminan por abandono o por tiempo**, unos 40 puntos por debajo de las victorias.
+- Entre una victoria y una derrota limpia hay unos 5.6 puntos, y con estos tamaños no es concluyente.
+- Los empates son solo 35 partidas, muy pocas para interpretarlos.
+- 307 de las 1,314 partidas (23%) terminan por abandono (149) o por tiempo (158), es decir, casi una de cada cuatro.
+
+No sé **por qué** ocurre. "Tiempo" mezcla interrupciones con partidas normales que se acabaron por reloj, y "abandono" puede ser una interrupción o una decisión. Para separarlos necesito saber cuántas jugadas llevaba cada partida al terminar.
+
+## Preguntas abiertas
+
+- ¿Las partidas que terminan por abandono o por tiempo son interrupciones (pocas jugadas) o partidas normales que se acabaron por reloj (muchas jugadas)?
+- ¿A qué se deben las olas de 80 a 160 puntos en blitz, si no son rachas de una partida a la siguiente?
 - ¿Por qué la recuperación de rapid en octubre de 2026 fue tan rápida? Dos hipótesis sin comprobar: que el blitz de ese año me haya mejorado, o un efecto del sistema de rating tras mucho tiempo de inactividad.
 - ¿Por qué rindo mejor con blancas, sobre todo en blitz?
 
@@ -97,14 +136,16 @@ Esto explica por qué las gráficas por fecha engañan: **el rating solo se muev
 2. Convierte las fechas de UTC a la hora de Ciudad de México y clasifica los resultados de Chess.com (`win`, `resigned`, `timeout`, `abandoned`...) en victoria, derrota o empate.
 3. Verifica que no haya duplicados ni resultados sin clasificar, y guarda todo en `partidas.csv`.
 4. `analisis.py` lee ese CSV, filtra y genera las tablas y gráficas: victorias por modo y color, rating por modo (por fecha y por número de partida) y partidas por mes y modo.
+5. `racha.py` analiza, en blitz, si el resultado de una partida influye en la siguiente y en si sigo jugando.
 
 ## Decisiones de análisis
 
 - Los **empates cuentan como "no ganó"** al calcular el porcentaje de victorias.
-- `abandoned`, `timeout`, `resigned` y `checkmated` se agrupan como **derrota**. Conservo la columna original (`mi_resultado`) para poder analizar cada tipo por separado.
+- `abandoned`, `timeout`, `resigned` y `checkmated` se agrupan como **derrota**. Conservo la columna original (`mi_resultado`) para poder analizar cada tipo por separado. Aquí `abandoned` significa que abandoné yo, y `timeout` que se me acabó el tiempo.
 - Excluyo las partidas **daily** (10 de 2,860) por ser muy pocas y de ritmo muy distinto. Esto también deja fuera la única partida de ajedrez 960.
 - Analizo **cada modo por separado**, porque cada uno tiene su propio rating.
 - Los meses se cuentan en **hora de Ciudad de México**, no en UTC.
+- Una partida pertenece a la **misma sesión** que la anterior si terminó 30 minutos o menos después. La hora es la de fin de cada partida, así que el intervalo incluye lo que dura la siguiente.
 
 ## Cómo correrlo
 
@@ -118,6 +159,7 @@ venv\Scripts\activate
 pip install -r requirements.txt
 py explorar.py
 py analisis.py
+py racha.py
 ```
 
 Para analizar otra cuenta, cambia `USUARIO` al inicio de `explorar.py` por un usuario de Chess.com en minúsculas. La variable `ULTIMOS_MESES` controla cuántos meses descarga (`None` baja todo el historial). Los datos descargados quedan en `partidas.csv`, que no se sube al repositorio. Las gráficas se guardan como PNG en la carpeta del proyecto.
@@ -139,10 +181,10 @@ Para analizar otra cuenta, cambia `USUARIO` al inicio de `explorar.py` por un us
 - [x] Evolución del rating en el tiempo, por modo de juego
 - [x] Partidas por mes y por modo de juego
 - [x] Rating por número de partida, sin el efecto de las pausas
-- [ ] Rachas: ¿gano más después de ganar y pierdo más después de perder?
+- [x] Rachas: ¿una victoria o una derrota cambia mi siguiente resultado?
+- [ ] Partidas abandonadas y por tiempo: cuántas jugadas llevaban al terminar
 - [ ] Rendimiento por hora del día
 - [ ] Análisis por apertura
-- [ ] Investigar las partidas abandonadas
 - [ ] Dashboard interactivo con Streamlit
 
 ## Datos
