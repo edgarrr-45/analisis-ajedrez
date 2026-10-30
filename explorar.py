@@ -50,6 +50,7 @@ def extraer_datos(game, usuario):
         "time_control": game.get("time_control"),
         "rules": game.get("rules"),
         "rated": game.get("rated"),
+        "pgn": game.get("pgn"),
     }
 
 
