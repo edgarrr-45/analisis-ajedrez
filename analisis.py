@@ -1,7 +1,10 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
+from pathlib import Path
 
+CARPETA = Path("imagenes")
+CARPETA.mkdir(exist_ok=True)
 
 df = pd.read_csv("partidas.csv")
 df["fecha"] = pd.to_datetime(df["fecha"], utc=True).dt.tz_convert("America/Mexico_City")
@@ -26,7 +29,7 @@ ax.yaxis.set_major_formatter(PercentFormatter(1.0))
 for c in ax.containers:
     ax.bar_label(c, labels=[f"{v:.1%}" for v in c.datavalues])
 plt.xticks(rotation=0)
-plt.savefig("victorias_por_modo.png", dpi=150, bbox_inches="tight")
+plt.savefig(CARPETA / "victorias_por_modo.png", dpi=150, bbox_inches="tight")
 plt.close()
 
 
@@ -45,11 +48,11 @@ def graficar_rating(df, modo, ventana=30, eje="fecha"):
     if eje == "fecha":
         titulo = f"Rating en {modo} a lo largo del tiempo"
         etiqueta_x = "Fecha"
-        archivo = f"rating_{modo}.png"
+        archivo = CARPETA / f"rating_{modo}_por_partida.png"
     else:
         titulo = f"Rating en {modo} por número de partida"
         etiqueta_x = "Número de partida"
-        archivo = f"rating_{modo}_por_partida.png"
+        archivo = CARPETA / f"rating_{modo}_por_partida.png"
 
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.plot(df_modo[eje], df_modo["mi_rating"], alpha=0.3, label="Cada partida")
@@ -84,7 +87,7 @@ ax.set_title("Partidas por mes")
 ax.set_xlabel("Mes")
 ax.set_ylabel("Partidas")
 plt.xticks(rotation=90, fontsize=8)
-plt.savefig("partidas_por_mes.png", dpi=150, bbox_inches="tight")
+plt.savefig(CARPETA / "partidas_por_mes.png", dpi=150, bbox_inches="tight")
 plt.close()
 
 
@@ -103,5 +106,5 @@ ax.set_xlabel("Mes")
 ax.set_ylabel("Partidas")
 ax.legend(title="Modo")
 plt.xticks(rotation=90, fontsize=8)
-plt.savefig("partidas_por_mes_modo.png", dpi=150, bbox_inches="tight")
+plt.savefig(CARPETA / "partidas_por_mes_modo.png", dpi=150, bbox_inches="tight")
 plt.close()
