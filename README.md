@@ -18,7 +18,7 @@ Descargo mi historial completo de la API pública de Chess.com, lo limpio con pa
 
 ## Hallazgo 1: rindo mejor con blancas
 
-![Victorias por modo y color](victorias_por_modo.png)
+![Victorias por modo y color](imagenes/victorias_por_modo.png)
 
 | Modo | Partidas con blancas | Victorias con blancas | Partidas con negras | Victorias con negras |
 |---|---|---|---|---|
@@ -39,9 +39,9 @@ Cada modo de juego tiene su propio rating en Chess.com, así que los analizo por
 
 ### Blitz
 
-![Rating en blitz por fecha](rating_blitz.png)
+![Rating en blitz por fecha](imagenes/rating_blitz.png)
 
-![Rating en blitz por número de partida](rating_blitz_por_partida.png)
+![Rating en blitz por número de partida](imagenes/rating_blitz_por_partida.png)
 
 - Hay progreso neto: de unos 150-380 en las primeras partidas a unos 540-550 hoy.
 - Por fecha parece que subo en escalones. **Por número de partida la subida es continua**: de unos 285 a unos 500 en unas 200 partidas (de la partida ~245 a la ~450). Los "saltos" eran partidas jugadas en pocas semanas, separadas por pausas.
@@ -50,9 +50,9 @@ Cada modo de juego tiene su propio rating en Chess.com, así que los analizo por
 
 ### Rapid
 
-![Rating en rapid por fecha](rating_rapid.png)
+![Rating en rapid por fecha](imagenes/rating_rapid.png)
 
-![Rating en rapid por número de partida](rating_rapid_por_partida.png)
+![Rating en rapid por número de partida](imagenes/rating_rapid_por_partida.png)
 
 - Es mi mejor modo: hoy ronda los 800, contra unos 550 en blitz.
 - Tras las primeras ~60 partidas de calibración, subí de forma sostenida de unos 290 a unos 790 en unas 700 partidas, y me quedé entre 690 y 820 durante unas 300 más.
@@ -60,7 +60,7 @@ Cada modo de juego tiene su propio rating en Chess.com, así que los analizo por
 
 ### Bullet
 
-![Rating en bullet por fecha](rating_bullet.png)
+![Rating en bullet por fecha](imagenes/rating_bullet.png)
 
 - Es el modo con menos partidas (263), así que la línea es ruidosa y no saco conclusiones fuertes.
 - Cayó de unos 400-585 al inicio a unos 200 hacia abril de 2025, y se recuperó a unos 330-370 en 2026.
@@ -73,7 +73,7 @@ Cada modo de juego tiene su propio rating en Chess.com, así que los analizo por
 
 ## Hallazgo 3: cambié de modo de juego dos veces
 
-![Partidas por mes y modo](partidas_por_mes_modo.png)
+![Partidas por mes y modo](imagenes/partidas_por_mes_modo.png)
 
 Mi actividad es muy irregular (de 2 a 250 partidas por mes) y, sobre todo, **cambia de modo con el tiempo**:
 
@@ -136,7 +136,7 @@ No sé **por qué** ocurre. "Tiempo" mezcla interrupciones con partidas normales
 2. Convierte las fechas de UTC a la hora de Ciudad de México y clasifica los resultados de Chess.com (`win`, `resigned`, `timeout`, `abandoned`...) en victoria, derrota o empate.
 3. Verifica que no haya duplicados ni resultados sin clasificar, y guarda todo en `partidas.csv`.
 4. `analisis.py` lee ese CSV, filtra y genera las tablas y gráficas: victorias por modo y color, rating por modo (por fecha y por número de partida) y partidas por mes y modo.
-5. `racha.py` analiza, en blitz, si el resultado de una partida influye en la siguiente y en si sigo jugando.
+5. `rachas.py` analiza, en blitz, si el resultado de una partida influye en la siguiente y en si sigo jugando.
 
 ## Decisiones de análisis
 
@@ -159,10 +159,10 @@ venv\Scripts\activate
 pip install -r requirements.txt
 py explorar.py
 py analisis.py
-py racha.py
+py rachas.py
 ```
 
-Para analizar otra cuenta, cambia `USUARIO` al inicio de `explorar.py` por un usuario de Chess.com en minúsculas. La variable `ULTIMOS_MESES` controla cuántos meses descarga (`None` baja todo el historial). Los datos descargados quedan en `partidas.csv`, que no se sube al repositorio. Las gráficas se guardan como PNG en la carpeta del proyecto.
+Para analizar otra cuenta, cambia `USUARIO` al inicio de `explorar.py` por un usuario de Chess.com en minúsculas. La variable `ULTIMOS_MESES` controla cuántos meses descarga (`None` baja todo el historial). Los datos descargados quedan en `partidas.csv`, que no se sube al repositorio. Las gráficas se guardan como PNG en la carpeta `imagenes`.
 
 ## Tecnologías
 
