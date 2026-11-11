@@ -8,13 +8,13 @@ Descargo mi historial completo de la API pública de Chess.com, lo limpio con pa
 
 ## Resumen de los datos
 
-**2,918 partidas** de 38 meses (octubre de 2023 a noviembre de 2026, descarga de noviembre de 2026), todas con rating y de ajedrez estándar:
+**2,943 partidas** de 38 meses (de octubre de 2023 al 9 de noviembre de 2026), todas con rating y de ajedrez estándar:
 
 | Modo | Partidas |
 |---|---|
 | Blitz | 1,347 |
-| Rapid | 1,296 |
-| Bullet | 275 |
+| Rapid | 1,300 |
+| Bullet | 296 |
 
 ## Hallazgo 1: rindo mejor con blancas
 
@@ -23,12 +23,12 @@ Descargo mi historial completo de la API pública de Chess.com, lo limpio con pa
 | Modo | Partidas con blancas | Victorias con blancas | Partidas con negras | Victorias con negras |
 |---|---|---|---|---|
 | Blitz | 669 | 54.4% | 678 | 45.6% |
-| Bullet | 145 | 53.1% | 130 | 46.2% |
-| Rapid | 639 | 51.8% | 657 | 49.0% |
+| Bullet | 154 | 54.5% | 142 | 45.1% |
+| Rapid | 642 | 52.0% | 658 | 49.1% |
 
 - En los tres modos gano más con blancas que con negras.
 - **En blitz la diferencia es la más clara** (unos 9 puntos, con casi 700 partidas por color), y es mayor que el margen de error de esos grupos.
-- En rapid (unos 3 puntos) y en bullet (pocas partidas) la tendencia va en la misma dirección, pero con la evidencia actual no puedo afirmar que sea real.
+- En rapid (unos 3 puntos) y en bullet (unos 9 puntos, pero con solo 154 y 142 partidas, dentro del margen de error) la tendencia va en la misma dirección, pero con la evidencia actual no puedo afirmar que sea real.
 - Con un solo mes de datos (octubre de 2026) vi lo contrario: más victorias con negras. Con el historial completo esa diferencia desapareció, lo que muestra lo engañoso que es sacar conclusiones de una muestra pequeña.
 
 Todavía no sé **por qué** pasa. Una hipótesis por probar es que alguna apertura con negras me cuesta especialmente, pero hoy no guardo la apertura de cada partida.
@@ -37,7 +37,7 @@ Todavía no sé **por qué** pasa. Una hipótesis por probar es que alguna apert
 
 Cada modo de juego tiene su propio rating en Chess.com, así que los analizo por separado. La línea tenue es el rating después de cada partida y la naranja es el promedio de las últimas 30 partidas (15 en bullet, que tiene pocas). Dibujo cada modo de dos formas: **por fecha** y **por número de partida**, que quita las pausas.
 
-> Las cifras de rating de este apartado están leídas de las gráficas generadas con la descarga de noviembre de 2026 (2,918 partidas).
+> Las cifras de blitz corresponden a la descarga actual. Las de rapid y bullet las leí con la descarga anterior (2,918 partidas); desde entonces sumé 4 partidas de rapid y 21 de bullet, así que algún valor reciente puede haber cambiado un poco.
 
 ### Blitz
 
@@ -66,7 +66,7 @@ Cada modo de juego tiene su propio rating en Chess.com, así que los analizo por
 
 ![Rating en bullet por número de partida](imagenes/rating_bullet_por_partida.png)
 
-- Es el modo con menos partidas (275), así que la línea es ruidosa y no saco conclusiones fuertes.
+- Es el modo con menos partidas (296), así que la línea es ruidosa y no saco conclusiones fuertes.
 - Tras unas 10 partidas de calibración (mis dos primeras fueron 482 y 585), el rating baja despacio hasta unos 200 hacia la partida ~150, alrededor de abril de 2025.
 - Desde ahí sube hasta unos 370 hacia la partida ~250 (marzo de 2026). El tramo de unos 300 a unos 370 coincide con la racha de bullet de diciembre de 2025 a marzo de 2026. Hoy ronda los 345-385.
 
@@ -82,10 +82,10 @@ Cada modo de juego tiene su propio rating en Chess.com, así que los analizo por
 
 Mi actividad es muy irregular (de 2 a 266 partidas por mes) y, sobre todo, **cambia de modo con el tiempo**:
 
-- **De octubre de 2023 a octubre de 2024 jugaba sobre todo rapid**: unas 1,130 de mis 1,296 partidas de rapid (87%).
+- **De octubre de 2023 a octubre de 2024 jugaba sobre todo rapid**: unas 1,130 de mis 1,300 partidas de rapid (87%).
 - **Desde noviembre de 2024 pasé a blitz**: unas 1,120 de mis 1,347 partidas de blitz son de ahí en adelante.
-- Entre enero de 2025 y septiembre de 2026 jugué solo 10 partidas de rapid. En octubre de 2026 volví con 106, y noviembre apenas empieza (24 partidas, 14 de rapid).
-- Bullet va a rachas: marzo de 2024, enero y abril de 2025, y de diciembre de 2025 a febrero de 2026, cuando casi todo lo que jugué fue bullet.
+- Entre enero de 2025 y septiembre de 2026 jugué solo 10 partidas de rapid. En octubre de 2026 volví con 106, y en los primeros nueve días de noviembre llevo 49 partidas (18 de rapid, 28 de bullet y 3 de blitz).
+- Bullet va a rachas: marzo de 2024, enero y abril de 2025, de diciembre de 2025 a febrero de 2026 (cuando casi todo lo que jugué fue bullet) y noviembre de 2026.
 - Octubre de 2026, con 266 partidas, es el mes con más actividad de todo el historial (el anterior récord eran 250 en marzo de 2024).
 
 Esto explica por qué las gráficas por fecha engañan: **el rating solo se mueve cuando juego**, así que una ráfaga de partidas en pocas semanas se ve como un salto, y una pausa como una línea plana.
@@ -128,20 +128,20 @@ La probabilidad de que mi siguiente partida llegue en menos de 30 minutos depend
 
 ## Hallazgo 5: los abandonos y los tiempos no son partidas que dejo al empezar
 
-Con el PGN de cada partida cuento cuántas jugadas se jugaron (los tres modos juntos, 2,918 partidas):
+Con el PGN de cada partida cuento cuántas jugadas se jugaron (los tres modos juntos, 2,943 partidas):
 
 | Cómo terminó | Partidas | Jugadas (mediana) |
 |---|---|---|
-| Victoria | 1,463 | 24 |
-| Mate recibido | 250 | 24 |
-| Rendición | 582 | 22 |
-| Abandono | 313 | 21 |
-| Tiempo | 231 | 32 |
+| Victoria | 1,478 | 24 |
+| Mate recibido | 251 | 24 |
+| Rendición | 584 | 22 |
+| Abandono | 314 | 21 |
+| Tiempo | 237 | 33 |
 
 - **Los abandonos no se concentran al inicio**: solo la cuarta parte termina antes de la jugada 14, y la mitad pasa de la 21.
 - **Los tiempos son partidas largas**: ninguno ocurrió antes de la jugada 11, y tres de cada cuatro pasaron de la 25.
-- Por modo, los abandonos duran 18 jugadas de mediana en blitz (150 partidas), 14 en bullet (23) y 24 en rapid (140). Los tiempos, 34 en blitz (166) y 27 en bullet (55); en rapid son solo 10, muy pocos para interpretarlos.
-- En conjunto, el abandono es el 10.7% de mis partidas y el tiempo el 7.9%: casi una de cada cinco (18.6%).
+- Por modo, los abandonos duran 18 jugadas de mediana en blitz (150 partidas), 14.5 en bullet (24) y 24 en rapid (140). Los tiempos, 34 en blitz (166) y 30 en bullet (61); en rapid son solo 10, muy pocos para interpretarlos.
+- En conjunto, el abandono es el 10.7% de mis partidas y el tiempo el 8.1%: casi una de cada cinco (18.7%).
 
 Esto descarta mi hipótesis inicial de que fueran interrupciones tempranas. No sé **por qué** ocurren: una interrupción puede llegar en cualquier momento, y también cabe que abandone cuando la partida ya va mal. Distinguirlo exigiría evaluar las posiciones con un motor de ajedrez.
 
@@ -151,11 +151,11 @@ La hora es la de **fin** de cada partida, en horario de Ciudad de México.
 
 | Franja | Partidas | Victorias | Terminan por abandono o tiempo |
 |---|---|---|---|
-| Madrugada 0-5 | 873 | 51.1% | 16.7% |
+| Madrugada 0-5 | 879 | 51.1% | 16.8% |
 | Mañana 6-9 | 69 | 47.8% | 27.5% |
 | Mediodía 10-14 | 227 | 41.4% | 37.0% |
-| Tarde 15-18 | 647 | 50.1% | 19.6% |
-| Noche 19-23 | 1,102 | 51.4% | 15.2% |
+| Tarde 15-18 | 653 | 50.1% | 19.9% |
+| Noche 19-23 | 1,115 | 51.6% | 15.2% |
 
 - **El porcentaje de victorias no cambia de forma clara con la hora** en las franjas con muchas partidas. La bajada del mediodía es en gran parte mecánica: un abandono o un tiempo cuentan como derrota.
 - Comparando solo **blitz**, para que el modo de juego no mezcle el resultado (en rapid casi nunca se acaba el reloj):
@@ -189,12 +189,13 @@ Lo trato como **una pista, no como una conclusión**: elegí la franja después 
 4. `analisis.py` lee ese CSV, filtra y genera las tablas y gráficas: victorias por modo y color, rating por modo (por fecha y por número de partida) y partidas por mes y modo.
 5. `rachas.py` analiza, en blitz, si el resultado de una partida influye en la siguiente y en si sigo jugando.
 6. `abandonos.py` cuenta las jugadas de cada partida a partir del PGN y estudia los abandonos, los tiempos y la hora del día.
+7. `cargar_sqlite.py` guarda los datos limpios en una base SQLite (`partidas.db`) para poder analizarlos también con SQL.
 
 ## Decisiones de análisis
 
 - Los **empates cuentan como "no ganó"** al calcular el porcentaje de victorias.
 - `abandoned`, `timeout`, `resigned` y `checkmated` se agrupan como **derrota**. Conservo la columna original (`mi_resultado`) para poder analizar cada tipo por separado. Aquí `abandoned` significa que abandoné yo, y `timeout` que se me acabó el tiempo.
-- Excluyo las partidas **daily** (10 de 2,928) por ser muy pocas y de ritmo muy distinto. Esto también deja fuera la única partida de ajedrez 960.
+- Excluyo las partidas **daily** (10 de 2,953) por ser muy pocas y de ritmo muy distinto. Esto también deja fuera la única partida de ajedrez 960.
 - Analizo **cada modo por separado**, porque cada uno tiene su propio rating.
 - Los meses y las horas se cuentan en **hora de Ciudad de México**, no en UTC.
 - Una partida pertenece a la **misma sesión** que la anterior si terminó 30 minutos o menos después. La hora es la de fin de cada partida, así que el intervalo incluye lo que dura la siguiente.
@@ -214,6 +215,7 @@ py explorar.py
 py analisis.py
 py rachas.py
 py abandonos.py
+py cargar_sqlite.py
 ```
 
 Para analizar otra cuenta, cambia `USUARIO` al inicio de `explorar.py` por un usuario de Chess.com en minúsculas. La variable `ULTIMOS_MESES` controla cuántos meses descarga (`None` baja todo el historial). Los datos descargados quedan en `partidas.csv`, que no se sube al repositorio. Las gráficas se guardan como PNG en la carpeta `imagenes`.
@@ -224,6 +226,7 @@ Para analizar otra cuenta, cambia `USUARIO` al inicio de `explorar.py` por un us
 - `requests`, para consumir la API pública de Chess.com
 - `pandas`, para la limpieza y el análisis
 - `matplotlib`, para las gráficas
+- SQLite (`sqlite3`), para guardar los datos y consultarlos con SQL
 
 ## Plan
 
@@ -238,6 +241,8 @@ Para analizar otra cuenta, cambia `USUARIO` al inicio de `explorar.py` por un us
 - [x] Rachas: ¿una victoria o una derrota cambia mi siguiente resultado?
 - [x] Partidas abandonadas y por tiempo: cuántas jugadas llevaban al terminar
 - [x] Rendimiento por hora del día
+- [x] Cargar los datos en una base SQLite
+- [ ] Consultas SQL que reproduzcan estos análisis (`consultas.sql`)
 - [ ] Análisis por apertura
 - [ ] Dashboard interactivo con Streamlit: que cualquier jugador escriba su usuario, vea sus estadísticas y elija una partida para analizarla (posiblemente con un motor de ajedrez)
 
