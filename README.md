@@ -169,6 +169,7 @@ La hora es la de **fin** de cada partida, en horario de Ciudad de México.
 | Noche 19-23 | 470 | 19.6% | 8.7% | 10.9% |
 
 - En blitz, el mediodía queda unos 14 puntos por encima de la tarde y unos 19 por encima de la noche, y los dos tipos de corte (abandono y tiempo) suben.
+- Las victorias en blitz por franja van de 41.0% al mediodía a 53.9% en la madrugada y 52.1% por la noche. La bajada del mediodía es en buena parte mecánica: un abandono o un tiempo cuentan como derrota, y justo ahí hay más.
 - **Pero casi todo el mediodía es de 2025.** En ese año, las partidas de blitz cortadas fueron 40.1% al mediodía (142 partidas), 26.5% por la tarde (181), 25.0% en la madrugada (56) y 19.0% por la noche (221). En 2024 y 2026 hay muy pocas partidas al mediodía (21 y 14) para comparar.
 
 Lo trato como **una pista, no como una conclusión**: elegí la franja después de ver los datos, el efecto se apoya en un solo año, y podría reflejar una época concreta (un horario, un periodo de clases) y no la hora en sí.
@@ -181,6 +182,42 @@ Lo trato como **una pista, no como una conclusión**: elegí la franja después 
 - ¿Por qué la recuperación de rapid en octubre de 2026 fue tan rápida y llegó a un máximo nuevo? Dos hipótesis sin comprobar: que el blitz de ese año me haya mejorado, o un efecto del sistema de rating tras mucho tiempo de inactividad.
 - ¿Por qué rindo mejor con blancas, sobre todo en blitz?
 
+## SQL: las mismas preguntas con otra herramienta
+
+`cargar_sqlite.py` guarda los datos limpios en una base SQLite (`partidas.db`), `consultas.sql` reúne consultas que reproducen varios de los análisis hechos con pandas, y `ejecutar_consultas.py` las corre todas y muestra los resultados.
+
+| Consulta | Qué calcula | Técnicas de SQL | Reproduce |
+|---|---|---|---|
+| 1 y 1b | Victorias por modo y color, y solo en blitz | `GROUP BY`, `AVG`, `WHERE` | Hallazgo 1 |
+| 2 y 2b | Victorias y abandonos o tiempos por franja del día, y solo en blitz | `CASE WHEN`, `IN` | Hallazgo 6 |
+| 3 | Victorias según el resultado de la partida anterior | CTE, `LAG`, `IS NOT NULL` | Hallazgo 4 |
+| 4 | Promedio móvil de 30 partidas del rating en blitz | `ROW_NUMBER`, `AVG() OVER (... ROWS BETWEEN ...)` | Gráficas de rating |
+| 5 | Si sigo jugando en menos de 30 minutos según cómo terminó la partida | CTE, `LEAD`, `strftime`, `CASE WHEN` | Hallazgo 4 |
+
+Las consultas 1, 1b, 2, 2b, 3 y 5 dan los mismos números que pandas (por ejemplo, 669 partidas de blitz con blancas y 54.4% de victorias, o 227 partidas al mediodía con 37.0% de abandonos o tiempos). El último valor de la consulta 4 (532.5) es consistente con el final de la línea naranja de la gráfica de blitz.
+
+Un ejemplo, la consulta 3, que hace en SQL lo que `shift(1)` hace en pandas:
+
+```sql
+WITH blitz AS (
+    SELECT
+        gane,
+        LAG(gane) OVER (ORDER BY fecha) AS gane_anterior
+    FROM partidas
+    WHERE time_class = 'blitz'
+)
+SELECT
+    gane_anterior,
+    COUNT(*) AS partidas,
+    ROUND(AVG(gane) * 100, 1) AS pct_victorias
+FROM blitz
+WHERE gane_anterior IS NOT NULL
+GROUP BY gane_anterior
+ORDER BY gane_anterior;
+```
+
+Decisiones al cargar los datos: el mes y la hora se calculan en pandas, en hora de Ciudad de México, y la fecha se guarda como texto sin desfase, para que las funciones de fecha de SQLite no la conviertan a UTC. El PGN no se carga porque pesa mucho y estas consultas no lo necesitan.
+
 ## Qué hace el proyecto
 
 1. `explorar.py` consulta la API pública de Chess.com, descarga mis partidas mes por mes y extrae los datos desde mi perspectiva: mi color, mi rating, el del rival, mi resultado, el modo de juego, las reglas y el PGN.
@@ -190,6 +227,7 @@ Lo trato como **una pista, no como una conclusión**: elegí la franja después 
 5. `rachas.py` analiza, en blitz, si el resultado de una partida influye en la siguiente y en si sigo jugando.
 6. `abandonos.py` cuenta las jugadas de cada partida a partir del PGN y estudia los abandonos, los tiempos y la hora del día.
 7. `cargar_sqlite.py` guarda los datos limpios en una base SQLite (`partidas.db`) para poder analizarlos también con SQL.
+8. `ejecutar_consultas.py` corre las consultas de `consultas.sql` sobre esa base y muestra los resultados.
 
 ## Decisiones de análisis
 
@@ -216,6 +254,7 @@ py analisis.py
 py rachas.py
 py abandonos.py
 py cargar_sqlite.py
+py ejecutar_consultas.py
 ```
 
 Para analizar otra cuenta, cambia `USUARIO` al inicio de `explorar.py` por un usuario de Chess.com en minúsculas. La variable `ULTIMOS_MESES` controla cuántos meses descarga (`None` baja todo el historial). Los datos descargados quedan en `partidas.csv`, que no se sube al repositorio. Las gráficas se guardan como PNG en la carpeta `imagenes`.
@@ -242,7 +281,7 @@ Para analizar otra cuenta, cambia `USUARIO` al inicio de `explorar.py` por un us
 - [x] Partidas abandonadas y por tiempo: cuántas jugadas llevaban al terminar
 - [x] Rendimiento por hora del día
 - [x] Cargar los datos en una base SQLite
-- [ ] Consultas SQL que reproduzcan estos análisis (`consultas.sql`)
+- [x] Consultas SQL que reproducen estos análisis (`consultas.sql`)
 - [ ] Análisis por apertura
 - [ ] Dashboard interactivo con Streamlit: que cualquier jugador escriba su usuario, vea sus estadísticas y elija una partida para analizarla (posiblemente con un motor de ajedrez)
 
