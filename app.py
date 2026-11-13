@@ -71,6 +71,9 @@ st.title("Análisis de partidas de Chess.com")
 usuario = st.text_input("Usuario de Chess.com").strip().lower()
 
 if st.button("Analizar"):
+    # Al pulsar el botón se borran los resultados anteriores
+    st.session_state.pop("df", None)
+
     if not usuario:
         st.warning("Escribe un usuario de Chess.com.")
     else:
@@ -92,5 +95,15 @@ if st.button("Analizar"):
             if df.empty:
                 st.warning("No hay partidas de blitz, rapid o bullet en ese periodo.")
             else:
-                st.success(f"Se descargaron {len(df)} partidas de blitz, rapid y bullet")
-                mostrar_resumen(df)
+                # Guardar en la memoria de la sesión para que no se pierda
+                st.session_state["df"] = df
+                st.session_state["usuario_analizado"] = usuario
+
+# Esto va FUERA del botón: se dibuja siempre que haya resultados guardados
+if "df" in st.session_state:
+    df = st.session_state["df"]
+    st.success(
+        f"{st.session_state['usuario_analizado']}: {len(df)} partidas "
+        "de blitz, rapid y bullet en los últimos 3 meses"
+    )
+    mostrar_resumen(df)
