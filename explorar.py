@@ -7,7 +7,7 @@ USUARIO = "edgarrr_45"
 HEADERS = {"User-Agent": "proyecto-analisis-ajedrez"}
 
 # None = todos los meses. Para probar, pon un número (por ejemplo 3).
-ULTIMOS_MESES = None
+ULTIMOS_MESES = 3
 
 REGLA = {
     "win": "victoria",
@@ -63,21 +63,29 @@ def descargar_mes(url_mes, headers, usuario):
     return pd.DataFrame(filas)
 
 
-def main():
-    lista_archives = obtener_meses(USUARIO, HEADERS)
-    if ULTIMOS_MESES is None:
+def cargar_partidas(usuario, ultimos_meses=None, mostrar_avance=False):
+    """Descarga las partidas de un usuario y devuelve la tabla ya limpia.
+
+    No imprime nada (salvo el avance, si se pide) y no guarda archivos:
+    solo devuelve el DataFrame. Así la puede usar cualquier script o la app.
+    """
+    lista_archives = obtener_meses(usuario, HEADERS)
+    if ultimos_meses is None:
         meses = lista_archives
     else:
-        meses = lista_archives[-ULTIMOS_MESES:]
+        meses = lista_archives[-ultimos_meses:]
 
     tablas = []
     for url_mes in meses:
-        tabla = descargar_mes(url_mes, HEADERS, USUARIO)
+        tabla = descargar_mes(url_mes, HEADERS, usuario)
         tablas.append(tabla)
-        print(f"{url_mes[-7:]}: {len(tabla)} partidas")
+        if mostrar_avance:
+            print(f"{url_mes[-7:]}: {len(tabla)} partidas")
         time.sleep(0.5)
 
-    df = pd.concat(tablas, ignore_index=True)
+    df = pd.concat(tablas, ignore_index=True) if tablas else pd.DataFrame()
+    if df.empty:
+        raise ValueError(f"No se encontraron partidas para {usuario}")
 
     df["fecha"] = (
         pd.to_datetime(df["fecha"], unit="s")
@@ -86,6 +94,11 @@ def main():
     )
     df["resultado"] = df["mi_resultado"].map(REGLA)
     df["gane"] = df["resultado"] == "victoria"
+    return df
+
+
+def main():
+    df = cargar_partidas(USUARIO, ULTIMOS_MESES, mostrar_avance=True)
 
     print(df.shape)
     print("duplicados:", df["url"].duplicated().sum())
@@ -95,11 +108,11 @@ def main():
 
     print(df["resultado"].value_counts())
     print(df.groupby("mi_color")["gane"].agg(["mean", "count"]))
-
-    df.to_csv("partidas.csv", index=False)
     print(df["time_class"].value_counts())
     print(df["rules"].value_counts())
     print(df["rated"].value_counts())
+
+    df.to_csv("partidas.csv", index=False)
 
 
 if __name__ == "__main__":
