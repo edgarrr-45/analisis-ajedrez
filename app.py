@@ -7,6 +7,12 @@ from explorar import cargar_partidas
 MODOS = ["blitz", "rapid", "bullet"]
 
 
+@st.cache_data(ttl=3600, show_spinner=False)
+def descargar(usuario, meses):
+    """Descarga las partidas. Streamlit recuerda el resultado durante 1 hora."""
+    return cargar_partidas(usuario, ultimos_meses=meses)
+
+
 def grafica_barras(serie, titulo_y, orden=None, colores=None):
     """Gráfica de barras con el eje vertical empezando en 0 y las etiquetas rectas."""
     datos = serie.reset_index()
@@ -79,7 +85,7 @@ if st.button("Analizar"):
     else:
         try:
             with st.spinner("Descargando las partidas..."):
-                df = cargar_partidas(usuario, ultimos_meses=3)
+                df = descargar(usuario, 3)
         except requests.HTTPError as error:
             if error.response is not None and error.response.status_code == 404:
                 st.error(f"No encontré al usuario «{usuario}». Revisa cómo está escrito.")
