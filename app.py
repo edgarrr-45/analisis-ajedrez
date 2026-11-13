@@ -75,6 +75,7 @@ def mostrar_resumen(df):
 st.title("Análisis de partidas de Chess.com")
 
 usuario = st.text_input("Usuario de Chess.com").strip().lower()
+meses = st.slider("Meses a descargar", min_value=1, max_value=12, value=3)
 
 if st.button("Analizar"):
     # Al pulsar el botón se borran los resultados anteriores
@@ -85,7 +86,7 @@ if st.button("Analizar"):
     else:
         try:
             with st.spinner("Descargando las partidas..."):
-                df = descargar(usuario, 3)
+                df = descargar(usuario, meses)
         except requests.HTTPError as error:
             if error.response is not None and error.response.status_code == 404:
                 st.error(f"No encontré al usuario «{usuario}». Revisa cómo está escrito.")
@@ -104,12 +105,22 @@ if st.button("Analizar"):
                 # Guardar en la memoria de la sesión para que no se pierda
                 st.session_state["df"] = df
                 st.session_state["usuario_analizado"] = usuario
+                st.session_state["meses_analizados"] = meses
 
 # Esto va FUERA del botón: se dibuja siempre que haya resultados guardados
 if "df" in st.session_state:
     df = st.session_state["df"]
+    n_meses = st.session_state["meses_analizados"]
+    periodo = f"los últimos {n_meses} meses" if n_meses > 1 else "el último mes"
     st.success(
         f"{st.session_state['usuario_analizado']}: {len(df)} partidas "
-        "de blitz, rapid y bullet en los últimos 3 meses"
+        f"de blitz, rapid y bullet en {periodo}"
     )
-    mostrar_resumen(df)
+
+    modos = st.multiselect("Modos de juego", MODOS, default=MODOS)
+    filtrado = df[df["time_class"].isin(modos)]
+
+    if filtrado.empty:
+        st.info("Elige al menos un modo de juego que tenga partidas.")
+    else:
+        mostrar_resumen(filtrado)
