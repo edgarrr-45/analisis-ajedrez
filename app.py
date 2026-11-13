@@ -88,8 +88,11 @@ if st.button("Analizar"):
             with st.spinner("Descargando las partidas..."):
                 df = descargar(usuario, meses)
         except requests.HTTPError as error:
-            if error.response is not None and error.response.status_code == 404:
+            codigo = error.response.status_code if error.response is not None else None
+            if codigo == 404:
                 st.error(f"No encontré al usuario «{usuario}». Revisa cómo está escrito.")
+            elif codigo == 429:
+                st.error("Chess.com recibió demasiadas peticiones. Espera un minuto e intenta de nuevo.")
             else:
                 st.error("Chess.com no respondió bien. Intenta de nuevo en unos minutos.")
         except requests.RequestException:
@@ -124,3 +127,9 @@ if "df" in st.session_state:
         st.info("Elige al menos un modo de juego que tenga partidas.")
     else:
         mostrar_resumen(filtrado)
+
+st.divider()
+st.caption(
+    "Herramienta independiente, sin relación con Chess.com. "
+    "Usa los datos públicos de su API."
+)

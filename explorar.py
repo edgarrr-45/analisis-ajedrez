@@ -7,7 +7,7 @@ USUARIO = "edgarrr_45"
 HEADERS = {"User-Agent": "proyecto-analisis-ajedrez"}
 
 # None = todos los meses. Para probar, pon un número (por ejemplo 3).
-ULTIMOS_MESES = 3
+ULTIMOS_MESES = None
 
 REGLA = {
     "win": "victoria",
