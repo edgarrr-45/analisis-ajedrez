@@ -2,11 +2,13 @@
 
 *Análisis de mis partidas de Chess.com con Python, pandas y SQL.*
 
+**App en línea:** https://ajedrez-en-datos.streamlit.app/ (escribe tu usuario de Chess.com y mira tus estadísticas).
+
 Proyecto de análisis de datos con Python para responder una pregunta simple: **¿dónde pierdo mis partidas?**
 
 Descargo mi historial completo de la API pública de Chess.com, lo limpio con pandas y lo analizo para encontrar patrones en mi forma de jugar: por color, por modo de juego, a lo largo del tiempo, por rachas, por duración de la partida y por hora del día.
 
-> **Estado: en progreso.** Ya tengo el historial completo descargado y limpio, y seis análisis hechos. Lo siguiente es el análisis por apertura y un dashboard interactivo.
+> **Estado: en progreso.** Ya tengo el historial completo descargado y limpio, seis análisis hechos y una app en línea donde cualquier jugador puede ver sus estadísticas. Lo siguiente es analizar una partida elegida y el análisis por apertura.
 
 ## Resumen de los datos
 
@@ -230,6 +232,7 @@ Decisiones al cargar los datos: el mes y la hora se calculan en pandas, en hora 
 6. `abandonos.py` cuenta las jugadas de cada partida a partir del PGN y estudia los abandonos, los tiempos y la hora del día.
 7. `cargar_sqlite.py` guarda los datos limpios en una base SQLite (`partidas.db`) para poder analizarlos también con SQL.
 8. `ejecutar_consultas.py` corre las consultas de `consultas.sql` sobre esa base y muestra los resultados.
+9. `app.py` es la app de Streamlit: descarga las partidas recientes de cualquier usuario de Chess.com (con caché) y muestra sus estadísticas, con selectores de meses y de modo de juego.
 
 ## Decisiones de análisis
 
@@ -257,6 +260,7 @@ py rachas.py
 py abandonos.py
 py cargar_sqlite.py
 py ejecutar_consultas.py
+streamlit run app.py
 ```
 
 Para analizar otra cuenta, cambia `USUARIO` al inicio de `explorar.py` por un usuario de Chess.com en minúsculas. La variable `ULTIMOS_MESES` controla cuántos meses descarga (`None` baja todo el historial). Los datos descargados quedan en `partidas.csv`, que no se sube al repositorio. Las gráficas se guardan como PNG en la carpeta `imagenes`.
@@ -268,6 +272,7 @@ Para analizar otra cuenta, cambia `USUARIO` al inicio de `explorar.py` por un us
 - `pandas`, para la limpieza y el análisis
 - `matplotlib`, para las gráficas
 - SQLite (`sqlite3`), para guardar los datos y consultarlos con SQL
+- Streamlit y Altair, para la app web
 
 ## Plan
 
@@ -285,7 +290,8 @@ Para analizar otra cuenta, cambia `USUARIO` al inicio de `explorar.py` por un us
 - [x] Cargar los datos en una base SQLite
 - [x] Consultas SQL que reproducen estos análisis (`consultas.sql`)
 - [ ] Análisis por apertura
-- [ ] Dashboard interactivo con Streamlit: que cualquier jugador escriba su usuario, vea sus estadísticas y elija una partida para analizarla (posiblemente con un motor de ajedrez)
+- [x] App con Streamlit: cualquier jugador escribe su usuario y ve sus estadísticas recientes
+- [ ] Elegir una partida concreta y analizarla (posiblemente con un motor de ajedrez)
 
 ## Datos
 
