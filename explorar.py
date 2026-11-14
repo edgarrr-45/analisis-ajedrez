@@ -4,7 +4,9 @@ import pandas as pd
 import requests
 
 USUARIO = "edgarrr_45"
-HEADERS = {"User-Agent": "proyecto-analisis-ajedrez"}
+HEADERS = {
+    "User-Agent": "ajedrez-en-datos/1.0 (username: edgarrr_45; contact: https://github.com/edgarrr-45/ajedrez-en-datos)"
+}
 
 # None = todos los meses. Para probar, pon un número (por ejemplo 3).
 ULTIMOS_MESES = None

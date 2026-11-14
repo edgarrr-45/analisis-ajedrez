@@ -4,6 +4,8 @@ import streamlit as st
 
 from explorar import cargar_partidas
 
+st.set_page_config(page_title="Ajedrez en datos", page_icon="♟️")
+
 MODOS = ["blitz", "rapid", "bullet"]
 
 
@@ -72,7 +74,8 @@ def mostrar_resumen(df):
     )
 
 
-st.title("Análisis de partidas de Chess.com")
+st.title("Ajedrez en datos")
+st.caption("Estadísticas de tus partidas, hechas con los datos públicos de tu cuenta de Chess.com.")
 
 usuario = st.text_input("Usuario de Chess.com").strip().lower()
 meses = st.slider("Meses a descargar", min_value=1, max_value=12, value=3)

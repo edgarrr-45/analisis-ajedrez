@@ -1,4 +1,6 @@
-# Análisis de mis partidas de Chess.com
+# Ajedrez en datos
+
+*Análisis de mis partidas de Chess.com con Python, pandas y SQL.*
 
 Proyecto de análisis de datos con Python para responder una pregunta simple: **¿dónde pierdo mis partidas?**
 
@@ -244,8 +246,8 @@ Decisiones al cargar los datos: el mes y la hora se calculan en pandas, en hora 
 Requiere Python 3. Instrucciones para Windows:
 
 ```
-git clone https://github.com/edgarrr-45/analisis-ajedrez.git
-cd analisis-ajedrez
+git clone https://github.com/edgarrr-45/ajedrez-en-datos.git
+cd ajedrez-en-datos
 py -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
